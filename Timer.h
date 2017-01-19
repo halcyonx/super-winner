@@ -9,10 +9,10 @@ public:
 
 	void Start();
 	void Stop();
-	void Reset(int threshold);
-	int Threshold() const;
+	void Reset();
 	void Update(float dt);
 	bool Expired() const;
+	bool IsActive() const;
 	void Draw();
 private:
 	class Self;

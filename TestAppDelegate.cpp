@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "TestAppDelegate.h"
 #include "Shooter.h"
+#include "Interface.h"
 
 enum {
 	WINDOW_WIDTH = 1024,
@@ -35,6 +36,7 @@ void TestAppDelegate::RegisterTypes()
 	// его необходимо зарегистрировать таким образом.
 	//
 	REGISTER_WIDGET_XML(Shooter, "Shooter");
+	REGISTER_WIDGET_XML(Interface, "Interface");
 }
 
 void TestAppDelegate::LoadResources()

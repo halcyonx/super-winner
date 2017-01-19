@@ -1,20 +1,16 @@
 #pragma once
 
-///
-/// Виджет - основной визуальный элемент на экране.
-/// Он отрисовывает себя, а также может содержать другие виджеты.
-///
-class Shooter : public GUI::Widget
+class Interface : public GUI::Widget
 {
 public:
-	Shooter(const std::string& name, rapidxml::xml_node<>* elem);
-	virtual ~Shooter();
+	Interface(const std::string& name, rapidxml::xml_node<>* elem);
+	virtual ~Interface();
 
 	void Draw() override;
 	void Update(float dt) override;
-	
+
 	void AcceptMessage(const Message& message) override;
-	
+
 	bool MouseDown(const IPoint& mouse_pos) override;
 	void MouseMove(const IPoint& mouse_pos) override;
 	void MouseUp(const IPoint& mouse_pos) override;
@@ -24,7 +20,7 @@ public:
 
 private:
 	void Init();
-	void Reset();
+
 private:
 	class Self;
 	Self* self;
