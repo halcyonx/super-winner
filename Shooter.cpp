@@ -4,10 +4,12 @@
 #include "Target.h"
 #include "Gun.h"
 #include "Bullet.h"
+#include "Timer.h"
 #include "GameUtils.h"
 #include <memory>
 
 #define TESTED
+#define DEBUG
 
 #define type(t) \
 std::shared_ptr<t>
@@ -20,7 +22,7 @@ public:
 	{}
 
 	// количество пуль, которые могут быть выпущены одновременно
-	const int MAX_BULLETS = 3;
+	const unsigned int MAX_BULLETS = 3;
 	const float SHOOT_DELAY = .5f;
 
 	// _params служит для хранения параметров игры (CountTarget, Speed, Time)
@@ -28,6 +30,7 @@ public:
 
 	type(Background) _background;
 	type(Gun) _gun;
+	std::unique_ptr<Timer> _main_timer;
 	std::list<type(Target)> _targets;
 	std::list<type(Bullet)> _bullets;
 	float _timer, _acc;
@@ -81,6 +84,8 @@ void Shooter::Init()
 
 	self->_background = Background::create(Core::resourceManager.Get<Render::Texture>("background01"));
 	self->_gun = Gun::create(Core::resourceManager.Get<Render::Texture>("gun"), math::Vector3(Render::device.Width() * 0.5f, 80, 0));
+	self->_main_timer = Timer::create(self->_params["Time"]);
+	self->_main_timer->Start();
 
 	// инициализация мишеней
 	for (int i = 0; i < self->_params["CountTarget"]; ++i) {
@@ -93,13 +98,13 @@ void Shooter::Init()
 			)
 		);
 	}
-	Log::Debug("targets: " + std::to_string(self->_params["CountTarget"]));
 }
 
 void Shooter::Draw()
 {
 	// draw stuff
 	self->_background->Draw();
+	self->_main_timer->Draw();
 
 	for (auto& target : self->_targets) {
 		target->Draw();
@@ -110,16 +115,25 @@ void Shooter::Draw()
 
 	self->_gun->Draw();
 
+#ifdef DEBUG
 	IPoint mouse_pos = Core::mainInput.GetMousePos();
 	Render::BindFont("arial");
 	Render::PrintString(924 + 100 / 2, 35, utils::lexical_cast(mouse_pos.x) + ", " + utils::lexical_cast(mouse_pos.y), 1.f, CenterAlign);
+#endif // DEBUG
 }
 
 void Shooter::Update(float dt)
 {
 	self->_timer += dt;
 	self->_acc += dt;
-	
+
+	// если время игры истекло
+	if (self->_main_timer->Expired()) {
+
+	}
+	else
+		self->_main_timer->Update(dt);
+
 	while (self->_timer > 2 * math::PI)
 	{
 		self->_timer -= 2 * math::PI;
