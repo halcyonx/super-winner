@@ -14,8 +14,8 @@ public:
 	int _speed;
 };
 
-std::shared_ptr<Bullet> Bullet::create(Render::Texture* tex, const FPoint& pos, int speed) {
-	return std::make_shared<Bullet>(tex, pos, speed);
+std::unique_ptr<Bullet> Bullet::create(Render::Texture* tex, const FPoint& pos, int speed) {
+	return std::make_unique<Bullet>(tex, pos, speed);
 }
 
 Bullet::Bullet(Render::Texture* tex, const FPoint& pos, int speed) {

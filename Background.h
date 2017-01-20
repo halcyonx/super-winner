@@ -2,7 +2,7 @@
 
 class Background {
 public:
-	static std::shared_ptr<Background> create(Render::Texture* tex);
+	static std::unique_ptr<Background> create(Render::Texture* tex);
 	
 	Background(Render::Texture* tex);
 	~Background();

@@ -2,7 +2,7 @@
 
 class Target {
 public:
-	static std::shared_ptr<Target> create(Render::Texture* tex, const math::Vector3& pos, const math::Vector3& dir, float scale);
+	static std::unique_ptr<Target> create(Render::Texture* tex, const math::Vector3& pos, const math::Vector3& dir, float scale);
 
 	Target(Render::Texture* tex, const math::Vector3& pos, const math::Vector3& dir, float scale);
 	~Target();

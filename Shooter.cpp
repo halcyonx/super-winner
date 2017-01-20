@@ -30,10 +30,10 @@ public:
 	// _params служит для хранения параметров игры (CountTarget, Speed, Time)
 	std::map<std::string, int> _params;
 
-	type(Background) _background;
-	type(Gun) _gun;
-	std::list<type(Target)> _targets;
-	std::list<type(Bullet)> _bullets;
+	std::unique_ptr<Background> _background;
+	std::unique_ptr<Gun> _gun;
+	std::list<std::unique_ptr<Target>> _targets;
+	std::list<std::unique_ptr<Bullet>> _bullets;
 	float _timer, _acc;
 
 	// если курсор не слишком близко к краю окна и прошла задержка с предыдущего выстрела, можно стрелять

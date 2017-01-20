@@ -12,8 +12,8 @@ public:
 	float _scale;
 };
 
-std::shared_ptr<Target> Target::create(Render::Texture* tex, const math::Vector3& pos, const math::Vector3& dir, float scale) {
-	return std::make_shared<Target>(tex, pos, dir, scale);
+std::unique_ptr<Target> Target::create(Render::Texture* tex, const math::Vector3& pos, const math::Vector3& dir, float scale) {
+	return std::make_unique<Target>(tex, pos, dir, scale);
 }
 
 Target::Target(Render::Texture* tex, const math::Vector3& pos, const math::Vector3& dir, float scale) {

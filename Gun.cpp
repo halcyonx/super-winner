@@ -8,8 +8,8 @@ public:
 	math::Vector3 _pos;
 };
 
-std::shared_ptr<Gun> Gun::create(Render::Texture* tex, const math::Vector3& pos) {
-	return std::make_shared<Gun>(tex, pos);
+std::unique_ptr<Gun> Gun::create(Render::Texture* tex, const math::Vector3& pos) {
+	return std::make_unique<Gun>(tex, pos);
 }
 
 Gun::Gun(Render::Texture* tex, const math::Vector3& pos) {

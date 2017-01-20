@@ -2,7 +2,7 @@
 
 class Bullet {
 public:
-	static std::shared_ptr<Bullet> create(Render::Texture* tex, const FPoint& pos, int speed);
+	static std::unique_ptr<Bullet> create(Render::Texture* tex, const FPoint& pos, int speed);
 
 	Bullet(Render::Texture* tex, const FPoint& pos, int speed);
 	~Bullet();

@@ -1,8 +1,8 @@
 #include "stdafx.h"
 #include "Background.h"
 
-std::shared_ptr<Background> Background::create(Render::Texture* tex) {
-	return std::make_shared<Background>(tex);
+std::unique_ptr<Background> Background::create(Render::Texture* tex) {
+	return std::make_unique<Background>(tex);
 
 }
 class Background::Self {

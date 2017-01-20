@@ -2,7 +2,7 @@
 
 class Gun {
 public:
-	static std::shared_ptr<Gun> create(Render::Texture* tex, const math::Vector3& pos);
+	static std::unique_ptr<Gun> create(Render::Texture* tex, const math::Vector3& pos);
 
 	Gun(Render::Texture* tex, const math::Vector3& pos);
 	~Gun();
