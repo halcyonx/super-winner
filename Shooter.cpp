@@ -5,6 +5,7 @@
 #include "Gun.h"
 #include "Bullet.h"
 #include "GameUtils.h"
+#include "Config.h"
 #include <memory>
 
 #define TESTED
@@ -51,6 +52,7 @@ public:
 					auto temp = iter++;
 					_targets.erase(temp);
 					bullet->Stop();
+					Core::guiManager.getLayer("TestLayer")->getWidget("Interface")->AcceptMessage(Message("", "ScoreAdd"));
 					break;
 				}
 		}
@@ -70,22 +72,11 @@ Shooter::~Shooter() {
 
 void Shooter::Init()
 {
-	// инициализация параметрев игры из input.txt
-	auto stream = Core::fileSystem.OpenRead("input.txt");
-	IO::TextReader reader(stream.get());
-	std::string line;
-	line = reader.ReadAsciiLine();
-	while (line != "") {
-		auto vec = game_utils::split(line, '=');
-		self->_params[vec[0]] = std::stoi(vec[1]);
-		line = reader.ReadAsciiLine();
-	}
-
 	self->_background = Background::create(Core::resourceManager.Get<Render::Texture>("background01"));
 	self->_gun = Gun::create(Core::resourceManager.Get<Render::Texture>("gun"), math::Vector3(Render::device.Width() * 0.5f, 80, 0));
 
 	// инициализация мишеней
-	for (int i = 0; i < self->_params["CountTarget"]; ++i) {
+	for (int i = 0; i < Config::get("CountTarget"); ++i) {
 		self->_targets.push_back(
 			Target::create(
 				Core::resourceManager.Get<Render::Texture>("blue_bubble"),
@@ -100,7 +91,7 @@ void Shooter::Init()
 void Shooter::Reset() {
 	self->_bullets.clear();
 	self->_targets.clear();
-	for (int i = 0; i < self->_params["CountTarget"]; ++i) {
+	for (int i = 0; i < Config::get("CountTarget"); ++i) {
 		self->_targets.push_back(
 			Target::create(
 				Core::resourceManager.Get<Render::Texture>("blue_bubble"),
@@ -170,7 +161,7 @@ bool Shooter::MouseDown(const IPoint &mouse_pos)
 	{
 		if (self->_bullets.size() < self->MAX_BULLETS && self->is_allow_to_shoot(mouse_pos)) {
 			self->_bullets.push_back(Bullet::create(Core::resourceManager.Get<Render::Texture>("cannonball"),
-				FPoint(Render::device.Width() * 0.5f, -30), self->_params["Speed"]));
+				FPoint(Render::device.Width() * 0.5f, -30), Config::get("Speed")));
 			self->_bullets.back()->SetStartPoint(mouse_pos);
 			self->_bullets.back()->FlyTo(FPoint(mouse_pos.x, mouse_pos.y));
 			self->_acc = .0f;

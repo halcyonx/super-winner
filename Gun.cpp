@@ -16,7 +16,7 @@ Gun::Gun(Render::Texture* tex, const math::Vector3& pos) {
 	self = new Self;
 	self->_tex = tex;
 	self->_pos = pos;
-	self->_angle = 90.f;
+	self->_angle = 0.f;
 }
 
 Gun::~Gun() {
