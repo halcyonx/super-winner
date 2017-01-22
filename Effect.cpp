@@ -51,25 +51,17 @@ Effect::~Effect() {
 }
 
 void Effect::Draw() {
-	if (self->_eff && self->_active)
-	{
-		//float d = floats[self->_i++];
-		//FPoint currentPosition = self->_spline.getGlobalFrame(d);
-		FPoint currentPosition = self->_spline.getGlobalFrame(self->_dt);
-		self->_eff->posX = currentPosition.x + 0.f;
-		self->_eff->posY = currentPosition.y + 0.f;
-	}
 	self->_effCont.Draw();
 	if (self->_dt >= self->_t) {
 		Stop();
 	}
-	/*if (self->_i >= self->_size/3) {
-		Stop();
-	}*/
 }
 
 void Effect::Update(float dt) {
 	if (self->_eff) {
+		FPoint currentPosition = self->_spline.getGlobalFrame(self->_dt);
+		self->_eff->posX = currentPosition.x + 0.f;
+		self->_eff->posY = currentPosition.y + 0.f;
 		self->_effCont.Update(dt);
 		self->_dt += dt / 3.f;
 	}
