@@ -5,13 +5,18 @@
 #include "Cursor.h"
 #include "Config.h"
 #include "Scores.h"
+#include "Win.h"
+
+#define ptr(t) \
+std::unique_ptr<t>
 
 class Interface::Self {
 public:
-	std::unique_ptr<Timer> _main_timer;
-	std::unique_ptr<ReplayButton> _replay_button;
-	std::unique_ptr<Cursor> _cursor;
-	std::unique_ptr<Scores> _scores;
+	ptr(Timer) _main_timer;
+	ptr(ReplayButton) _replay_button;
+	ptr(Cursor) _cursor;
+	ptr(Scores) _scores;
+	ptr(WinPlate) _winplate;
 };
 
 Interface::Interface(const std::string& name, rapidxml::xml_node<>* elem)
@@ -30,6 +35,7 @@ void Interface::Init() {
 	self->_main_timer = Timer::create(Config::get("Time"));
 	self->_replay_button = ReplayButton::create();
 	self->_cursor = Cursor::create();
+	self->_winplate = WinPlate::create();
 	self->_scores = Scores::create(0);
 	self->_main_timer->Start();
 	ShowCursor(false);
@@ -41,6 +47,7 @@ void Interface::Draw() {
 	self->_main_timer->Draw();
 	self->_replay_button->Draw();
 	self->_scores->Draw();
+	self->_winplate->Draw();
 }
 
 void Interface::Update(float dt) {
@@ -49,8 +56,15 @@ void Interface::Update(float dt) {
 		Core::guiManager.getLayer("TestLayer")->getWidget("Shooter")->AcceptMessage(Message("StopGame", "StopGame"));
 		self->_replay_button->Show();
 	}
-	else
+	else {
+		if (self->_scores->GetScore() == Config::get("CountTarget") && self->_main_timer->IsActive()) {
+			Core::guiManager.getLayer("TestLayer")->getWidget("Shooter")->AcceptMessage(Message("", "Win"));
+			self->_winplate->Show();
+			self->_replay_button->Show();
+			self->_main_timer->Stop();
+		}
 		self->_main_timer->Update(dt);
+	}
 }
 
 void Interface::AcceptMessage(const Message& message) {
@@ -73,6 +87,7 @@ void Interface::MouseMove(const IPoint& mouse_pos) {
 void Interface::MouseUp(const IPoint& mouse_pos) {
 	if (self->_replay_button->MouseUp(mouse_pos) ) {
 		self->_replay_button->Hide();
+		self->_winplate->Hide();
 		self->_main_timer->Reset();
 		self->_main_timer->Start();
 		Core::guiManager.getLayer("TestLayer")->getWidget("Shooter")->AcceptMessage(Message("RestartGame", "RestartGame"));

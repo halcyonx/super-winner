@@ -1,15 +1,16 @@
 #include "stdafx.h"
 #include "Bullet.h"
+#include "SimpleEffect.h"
 
 class Bullet::Self {
 public:
 	Render::Texture* _tex;
+	std::unique_ptr<SimpleEffect> _effect;
 	IRect _rect;
 	FPoint _pos;
 	FPoint _st, _sp;
 	FPoint _delta;
 	bool _fly;
-	float _dx, _dy;
 	float _angle;
 	int _speed;
 	float _gravity;
@@ -28,6 +29,7 @@ Bullet::Bullet(Render::Texture* tex, const FPoint& pos, int speed) {
 	self->_speed = speed;
 	self->_fly = false;
 	self->_gravity = 0.045;
+	self->_angle = .0f;
 }
 
 Bullet::~Bullet() {
@@ -39,9 +41,11 @@ void Bullet::Draw() {
 	{
 		Render::device.PushMatrix();
 		Render::device.MatrixTranslate(self->_pos.x, self->_pos.y, 0);
+		Render::device.MatrixRotate(math::Vector3(0, 0, 1), self->_angle);
 		Render::device.MatrixTranslate(-self->_tex->_rect_width * 0.5f, -self->_tex->_rect_height * 0.5f, 0);
 		self->_tex->Draw();
 		Render::device.PopMatrix();
+		self->_effect->Draw();
 	}
 }
 
@@ -49,6 +53,11 @@ void Bullet::Update(float dt)
 {
 	self->_pos += self->_delta;
 	self->_delta.y -= self->_gravity;
+	self->_angle += -10.;
+	auto r = FPoint(sin(self->_angle)*7.f, cos(self->_angle)*7.f);
+	self->_effect->SetPos(self->_pos + r);
+	//Log::Debug("pos: " + std::to_string(cos(dt)*50.f) + ", " + std::to_string(sin(dt)*50.f));
+	self->_effect->Update(dt);
 	if (self->_pos.x >= Render::device.Width() || self->_pos.x <= 0)
 	{
 		self->_fly = false;
@@ -85,7 +94,8 @@ void Bullet::FlyTo(const FPoint& p) {
 			self->_delta.x = -self->_delta.x;
 			self->_delta.y = -self->_delta.y;
 		}
-		self->_pos = self->_sp + 5 * self->_delta; // math::Vector3(_st.x + _dx * 15, _st.y + _dy * 10, 0);
+		self->_pos = self->_sp + 5 * self->_delta;
+		self->_effect = SimpleEffect::create(self->_pos);
 	}
 }
 

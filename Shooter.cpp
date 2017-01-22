@@ -178,7 +178,7 @@ bool Shooter::MouseDown(const IPoint &mouse_pos)
 	else 
 	{
 		if (self->_bullets.size() < self->MAX_BULLETS && self->is_allow_to_shoot(mouse_pos)) {
-			self->_bullets.push_back(Bullet::create(Core::resourceManager.Get<Render::Texture>("cannonball"),
+			self->_bullets.push_back(Bullet::create(Core::resourceManager.Get<Render::Texture>("serious_bomb2"),
 				FPoint(Render::device.Width() * 0.5f, -30), Config::get("Speed")));
 			self->_bullets.back()->SetStartPoint(mouse_pos);
 			self->_bullets.back()->FlyTo(FPoint(mouse_pos.x, mouse_pos.y));
@@ -219,6 +219,9 @@ void Shooter::AcceptMessage(const Message& message)
 	else if (data == "RestartGame") {
 		Reset();
 		self->_run = true;
+	}
+	else if (data == "Win") {
+		self->_run = false;
 	}
 }
 
