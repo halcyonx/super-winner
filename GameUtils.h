@@ -17,7 +17,7 @@ namespace game_utils {
 			return std::stof(f);
 		}
 
-		math::Vector3 random_vec(int min, int max) {
+		FPoint random_vec(int min, int max) {
 
 			auto rnd = [=]() {
 				static std::random_device rd;
@@ -29,7 +29,7 @@ namespace game_utils {
 				return a;
 			};
 
-			return math::Vector3{ static_cast<float>(rnd()), static_cast<float>(rnd()), 0 };
+			return FPoint{ static_cast<float>(rnd()), static_cast<float>(rnd()) };
 		}
 
 		std::vector<std::string> split(const std::string& s, char sep)

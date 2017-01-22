@@ -3,6 +3,14 @@
 #include "Shooter.h"
 #include "Interface.h"
 
+#define DEBUG
+
+#ifdef DEBUG
+
+#include "TestWidget.h"
+
+#endif //DEBUG
+
 enum {
 	WINDOW_WIDTH = 1024,
 	WINDOW_HEIGHT = 768
@@ -37,6 +45,10 @@ void TestAppDelegate::RegisterTypes()
 	//
 	REGISTER_WIDGET_XML(Shooter, "Shooter");
 	REGISTER_WIDGET_XML(Interface, "Interface");
+
+#ifdef DEBUG
+	REGISTER_WIDGET_XML(TestWidget, "TestWidget");
+#endif // DEBUG
 }
 
 void TestAppDelegate::LoadResources()

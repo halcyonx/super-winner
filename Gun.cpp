@@ -5,14 +5,14 @@ class Gun::Self {
 public:
 	Render::Texture* _tex;
 	float _angle;
-	math::Vector3 _pos;
+	FPoint _pos;
 };
 
-std::unique_ptr<Gun> Gun::create(Render::Texture* tex, const math::Vector3& pos) {
+std::unique_ptr<Gun> Gun::create(Render::Texture* tex, const FPoint& pos) {
 	return std::make_unique<Gun>(tex, pos);
 }
 
-Gun::Gun(Render::Texture* tex, const math::Vector3& pos) {
+Gun::Gun(Render::Texture* tex, const FPoint& pos) {
 	self = new Self;
 	self->_tex = tex;
 	self->_pos = pos;

@@ -12,6 +12,7 @@ public:
 	float _dx, _dy;
 	float _angle;
 	int _speed;
+	float _gravity;
 };
 
 std::unique_ptr<Bullet> Bullet::create(Render::Texture* tex, const FPoint& pos, int speed) {
@@ -26,6 +27,7 @@ Bullet::Bullet(Render::Texture* tex, const FPoint& pos, int speed) {
 	self->_st = pos;
 	self->_speed = speed;
 	self->_fly = false;
+	self->_gravity = 0.045;
 }
 
 Bullet::~Bullet() {
@@ -46,6 +48,7 @@ void Bullet::Draw() {
 void Bullet::Update(float dt)
 {
 	self->_pos += self->_delta;
+	self->_delta.y -= self->_gravity;
 	if (self->_pos.x >= Render::device.Width() || self->_pos.x <= 0)
 	{
 		self->_fly = false;
@@ -100,4 +103,8 @@ const IRect& Bullet::GetRect() const {
 	auto h = rect.Height() * .1f;
 	self->_rect = IRect(self->_pos.x + w, self->_pos.y + h, rect.RightTop().x - w, rect.RightTop().y - h);
 	return self->_rect;
+}
+
+const FPoint& Bullet::GetPos() const {
+	return self->_pos;
 }

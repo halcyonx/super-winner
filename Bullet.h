@@ -13,6 +13,7 @@ public:
 	bool IsFly() const;
 	void Stop() const;
 	const IRect& GetRect() const;
+	const FPoint& GetPos() const;
 private:
 	class Self;
 	Self* self;

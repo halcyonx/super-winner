@@ -2,9 +2,9 @@
 
 class Gun {
 public:
-	static std::unique_ptr<Gun> create(Render::Texture* tex, const math::Vector3& pos);
+	static std::unique_ptr<Gun> create(Render::Texture* tex, const FPoint& pos);
 
-	Gun(Render::Texture* tex, const math::Vector3& pos);
+	Gun(Render::Texture* tex, const FPoint& pos);
 	~Gun();
 	void Draw();
 	void Update(float dt);

@@ -4,6 +4,7 @@
 #include "Target.h"
 #include "Gun.h"
 #include "Bullet.h"
+#include "Effect.h"
 #include "GameUtils.h"
 #include "Config.h"
 #include <memory>
@@ -11,8 +12,12 @@
 #define TESTED
 #define DEBUG
 
-#define type(t) \
-std::shared_ptr<t>
+#define ptr(t) \
+std::unique_ptr<t>
+
+using Targets = std::list<std::unique_ptr<Target>>;
+using Bullets = std::list<std::unique_ptr<Bullet>>;
+using Effects = std::list<std::unique_ptr<Effect>>;
 
 class Shooter::Self {
 public:
@@ -26,15 +31,13 @@ public:
 	const unsigned int MAX_BULLETS = 3;
 	const float SHOOT_DELAY = .5f;
 	bool _run;
-
-	// _params служит для хранения параметров игры (CountTarget, Speed, Time)
-	std::map<std::string, int> _params;
-
-	std::unique_ptr<Background> _background;
-	std::unique_ptr<Gun> _gun;
-	std::list<std::unique_ptr<Target>> _targets;
-	std::list<std::unique_ptr<Bullet>> _bullets;
 	float _timer, _acc;
+
+	ptr(Background) _background;
+	ptr(Gun) _gun;
+	Targets _targets;
+	Bullets _bullets;
+	Effects _effects;
 
 	// если курсор не слишком близко к краю окна и прошла задержка с предыдущего выстрела, можно стрелять
 	bool is_allow_to_shoot(const IPoint& mouse_pos) {
@@ -49,12 +52,28 @@ public:
 			auto bullet_rect = bullet->GetRect();
 			for (auto iter = _targets.begin(); iter != _targets.end(); ++iter)
 				if (bullet_rect.Intersects((*iter)->GetRect())) {
-					auto temp = iter++;
-					_targets.erase(temp);
+					//auto temp = iter++;
+					_targets.erase(iter);
 					bullet->Stop();
-					Core::guiManager.getLayer("TestLayer")->getWidget("Interface")->AcceptMessage(Message("", "ScoreAdd"));
+					_effects.push_back(Effect::create(bullet->GetPos()));
+					_effects.back()->Start();
 					break;
 				}
+		}
+	}
+
+	// инициализация мишеней
+	void init_targets() {
+		_targets.clear();
+		for (int i = 0; i < Config::get("CountTarget"); ++i) {
+			_targets.push_back(
+				Target::create(
+					Core::resourceManager.Get<Render::Texture>("blue_bubble"),
+					game_utils::random_vec(300, 600), // случайная стартовая позиция
+					game_utils::random_vec(-5, 5), // случайное направление
+					game_utils::random_float() // случайный размер
+				)
+			);
 		}
 	}
 };
@@ -73,34 +92,16 @@ Shooter::~Shooter() {
 void Shooter::Init()
 {
 	self->_background = Background::create(Core::resourceManager.Get<Render::Texture>("background01"));
-	self->_gun = Gun::create(Core::resourceManager.Get<Render::Texture>("gun"), math::Vector3(Render::device.Width() * 0.5f, 80, 0));
+	self->_gun = Gun::create(Core::resourceManager.Get<Render::Texture>("gun"), FPoint(Render::device.Width() * 0.5f, 80.f));
 
 	// инициализация мишеней
-	for (int i = 0; i < Config::get("CountTarget"); ++i) {
-		self->_targets.push_back(
-			Target::create(
-				Core::resourceManager.Get<Render::Texture>("blue_bubble"),
-				game_utils::random_vec(300, 600), // случайная стартовая позиция
-				game_utils::random_vec(-5, 5), // случайное направление
-				game_utils::random_float() // случайный размер
-			)
-		);
-	}
+	self->init_targets();
 }
 
 void Shooter::Reset() {
 	self->_bullets.clear();
-	self->_targets.clear();
-	for (int i = 0; i < Config::get("CountTarget"); ++i) {
-		self->_targets.push_back(
-			Target::create(
-				Core::resourceManager.Get<Render::Texture>("blue_bubble"),
-				game_utils::random_vec(300, 600), // случайная стартовая позиция
-				game_utils::random_vec(-5, 5), // случайное направление
-				game_utils::random_float() // случайный размер
-			)
-		);
-	}
+	self->_effects.clear();
+	self->init_targets();
 }
 
 void Shooter::Draw()
@@ -116,6 +117,10 @@ void Shooter::Draw()
 		bullet->Draw();
 
 	self->_gun->Draw();
+
+	for (auto &effect : self->_effects) {
+		effect->Draw();
+	}
 
 #ifdef DEBUG
 	IPoint mouse_pos = Core::mainInput.GetMousePos();
@@ -149,6 +154,19 @@ void Shooter::Update(float dt)
 	}
 
 	self->collide();
+
+	for (auto iter = self->_effects.begin(); iter != self->_effects.end(); ) {
+		(*iter)->Update(dt);
+		if ((*iter)->Expires() && (*iter)->Alive()) {
+			(*iter)->Alive(false);
+			Core::guiManager.getLayer("TestLayer")->getWidget("Interface")->AcceptMessage(Message("", "ScoreAdd"));
+		}
+		if (!(*iter)->IsActive()) {
+			iter = self->_effects.erase(iter);
+			continue;
+		}
+		iter++;
+	}
 }
 
 bool Shooter::MouseDown(const IPoint &mouse_pos)

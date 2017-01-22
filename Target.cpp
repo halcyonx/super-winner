@@ -4,19 +4,19 @@
 class Target::Self {
 public:
 	Render::Texture* _tex;
-	math::Vector3 _pos;
-	math::Vector3 _dir;
+	FPoint _pos;
+	FPoint _dir;
 	IRect _rect;
 	int _width;
 	int _height;
 	float _scale;
 };
 
-std::unique_ptr<Target> Target::create(Render::Texture* tex, const math::Vector3& pos, const math::Vector3& dir, float scale) {
+std::unique_ptr<Target> Target::create(Render::Texture* tex, const FPoint& pos, const FPoint& dir, float scale) {
 	return std::make_unique<Target>(tex, pos, dir, scale);
 }
 
-Target::Target(Render::Texture* tex, const math::Vector3& pos, const math::Vector3& dir, float scale) {
+Target::Target(Render::Texture* tex, const FPoint& pos, const FPoint& dir, float scale) {
 	self = new Self;
 	self->_tex = tex;
 	self->_pos = pos;
@@ -32,7 +32,7 @@ Target::~Target() {
 
 void Target::Draw() {
 	Render::device.PushMatrix();
-	Render::device.MatrixTranslate(self->_pos.x, self->_pos.y, 0);
+	Render::device.MatrixTranslate(self->_pos);
 	Render::device.MatrixScale(self->_scale, self->_scale, 0.0);
 	Render::device.MatrixTranslate(-self->_tex->_rect_width * 0.5f, -self->_tex->_rect_height * 0.5f, 0);
 	self->_tex->Draw();
@@ -57,7 +57,7 @@ void Target::SetScale(float scale)
 	self->_scale = scale;
 }
 
-void Target::SetDirection(const math::Vector3& dir)
+void Target::SetDirection(const FPoint& dir)
 {
 	self->_dir = dir;
 }
