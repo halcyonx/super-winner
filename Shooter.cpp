@@ -14,9 +14,9 @@
 #define ptr(t) \
 std::unique_ptr<t>
 
-using Targets = std::list<std::unique_ptr<Target>>;
-using Bullets = std::list<std::unique_ptr<Bullet>>;
-using Effects = std::list<std::unique_ptr<Effect>>;
+using Targets = std::vector<std::unique_ptr<Target>>;
+using Bullets = std::vector<std::unique_ptr<Bullet>>;
+using Effects = std::vector<std::unique_ptr<Effect>>;
 
 class Shooter::Self {
 public:
@@ -58,13 +58,47 @@ public:
 			auto bullet_rect = bullet->GetRect();
 			for (auto iter = _targets.begin(); iter != _targets.end(); ++iter)
 				if (bullet_rect.Intersects((*iter)->GetRect())) {
-					_targets.erase(iter);
 					bullet->Stop();
+					(*iter)->Kill();
 					_effects.push_back(Effect::create("Iskra2", bullet->GetPos()));
 					_effects.back()->Start();
 					break;
 				}
 		}
+	}
+
+	// удаляем отработавшие объекты
+	void remove() {
+		// пули
+		auto end1 = std::remove_if(_bullets.begin(), _bullets.end(), [&](const ptr(Bullet)& ptr) {
+			if (!ptr->IsFly()) {
+				// эффект от пули передаем во владение Shooter, чтобы эффект плавно закончился
+				_effects.push_back(ptr->effect());
+				_effects.back()->Stop();
+			}
+			return !ptr->IsFly();
+		});
+		if (end1 != _bullets.end())
+			_bullets.resize(end1 - _bullets.begin());
+
+		// убитые мишени
+		auto end2 = std::remove_if(_targets.begin(), _targets.end(), [&](const ptr(Target)& ptr) {
+			return ptr->IsKilled();
+		});
+		if (end2 != _targets.end())
+			_targets.resize(end2 - _targets.begin());
+
+		// умирающие эффекты
+		auto end3 = std::remove_if(_effects.begin(), _effects.end(), [&](const ptr(Effect)& ptr) {
+			if (ptr->Expires() && ptr->Alive()) {
+				ptr->Alive(false);
+				// когда искра долетит до позииции с очками, увеличить значение
+				Core::guiManager.getLayer("TestLayer")->getWidget("Interface")->AcceptMessage(Message("", "ScoreAdd"));
+			}
+			return !ptr->IsActive();
+		});
+		if (end3 != _effects.end())
+			_effects.resize(end3 - _effects.begin());
 	}
 
 	// инициализация мишеней
@@ -145,36 +179,18 @@ void Shooter::Update(float dt)
 	}
 
 	// update всех выпущенных снарядов
-	for (auto iter = self->_bullets.begin(); iter != self->_bullets.end();) {
-		(*iter)->Update(dt);
-		auto temp = iter++;
-		//
-		// если снаряд перестал лететь (пересек границу окна/попал в цель),
-		// удаляется из списка и эффект, привязанный к снаряду отдается в список общих эффектов, для плавного завершения
-		// в противном случае он просто пропал бы
-		if (!(*temp)->IsFly()) {
-			self->_effects.push_back((*temp)->effect());
-			self->_effects.back()->Stop();
-			self->_bullets.erase(temp);
-		}
-	}
+	for (auto &bullet : self->_bullets)
+		bullet->Update(dt);
+
+	// update действующих эффектов
+	for (auto &effect : self->_effects)
+		effect->Update(dt);
 
 	// проверка на столкновения пуль с мишенями
 	self->collide();
 
-	// update действующих эффектов
-	for (auto iter = self->_effects.begin(); iter != self->_effects.end(); ) {
-		(*iter)->Update(dt);
-		if ((*iter)->Expires() && (*iter)->Alive()) {
-			(*iter)->Alive(false);
-			Core::guiManager.getLayer("TestLayer")->getWidget("Interface")->AcceptMessage(Message("", "ScoreAdd"));
-		}
-		if (!(*iter)->IsActive()) {
-			iter = self->_effects.erase(iter);
-			continue;
-		}
-		++iter;
-	}
+	// удаляет отработавшие объекты из памяти
+	self->remove();
 }
 
 bool Shooter::MouseDown(const IPoint &mouse_pos)
