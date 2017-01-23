@@ -10,14 +10,22 @@ public:
 	int _width;
 	int _height;
 	float _scale;
+
+	// граница снизу, чтобы мишени не залетали на пушку
+	static float BOTTOM_MARGIN;
+
+	// прямоугольник, используемый при вычислении столкновений усекается на (MARGIN * 100)% с краев
+	static float MARGIN;
 };
+float Target::Self::BOTTOM_MARGIN = 200.f;
+float Target::Self::MARGIN = .05f;
 
 std::unique_ptr<Target> Target::create(Render::Texture* tex, const FPoint& pos, const FPoint& dir, float scale) {
 	return std::make_unique<Target>(tex, pos, dir, scale);
 }
 
 Target::Target(Render::Texture* tex, const FPoint& pos, const FPoint& dir, float scale) {
-	self = new Self;
+	self = std::unique_ptr<Self>(new Self);
 	self->_tex = tex;
 	self->_pos = pos;
 	self->_dir = dir;
@@ -26,9 +34,8 @@ Target::Target(Render::Texture* tex, const FPoint& pos, const FPoint& dir, float
 	self->_width = Render::device.Width();
 }
 
-Target::~Target() {
-	delete self;
-}
+Target::~Target() 
+{}
 
 void Target::Draw() {
 	Render::device.PushMatrix();
@@ -44,7 +51,7 @@ void Target::Update(float dt)
 	self->_pos.x += self->_dir.x;
 	self->_pos.y += self->_dir.y;
 	auto w = self->_tex->_rect_width * self->_scale * 0.5f;
-	if (self->_pos.y >= self->_height - w || self->_pos.y <= w + 200) {
+	if (self->_pos.y >= self->_height - w || self->_pos.y <= w + self->BOTTOM_MARGIN) {
 		self->_dir.y = -self->_dir.y;
 	}
 	if (self->_pos.x >= self->_width - w || self->_pos.x <= w) {
@@ -65,8 +72,8 @@ void Target::SetDirection(const FPoint& dir)
 const IRect& Target::GetRect() const
 {
 	auto rect = self->_tex->getBitmapRect();
-	auto w = rect.Width() * .05f;
-	auto h = rect.Height() * .05f;
+	auto w = rect.Width() * self->MARGIN;
+	auto h = rect.Height() * self->MARGIN;
 	self->_rect = IRect(self->_pos.x, self->_pos.y, rect.RightTop().x * self->_scale - w, rect.RightTop().y * self->_scale - h);
 	return self->_rect;
 }
