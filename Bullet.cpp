@@ -12,8 +12,21 @@ public:
 	bool _fly;
 	float _angle;
 	int _speed;
-	float _gravity;
+
+	// используются для определния начальной позиции пули при выстреле
+	static float ANGLE_X;
+	static float ANGLE_Y;
+
+	// гравитация, действующая на пулю
+	static float GRAVITY;
+
+	// прямоугольник, используемый при вычислении столкновений усекается на (MARGIN * 100)% с краев
+	static float MARGIN;
 };
+float Bullet::Self::ANGLE_X = -175.f;
+float Bullet::Self::ANGLE_Y = 200.f;
+float Bullet::Self::GRAVITY = 0.045f;
+float Bullet::Self::MARGIN = .1f;
 
 std::unique_ptr<Bullet> Bullet::create(Render::Texture* tex, const FPoint& pos, int speed) {
 	return std::make_unique<Bullet>(tex, pos, speed);
@@ -27,7 +40,6 @@ Bullet::Bullet(Render::Texture* tex, const FPoint& pos, int speed) {
 	self->_st = pos;
 	self->_speed = speed;
 	self->_fly = false;
-	self->_gravity = 0.045;
 	self->_angle = .0f;
 }
 
@@ -50,7 +62,7 @@ void Bullet::Draw() {
 void Bullet::Update(float dt)
 {
 	self->_pos += self->_delta;
-	self->_delta.y -= self->_gravity;
+	self->_delta.y -= self->GRAVITY;
 	self->_angle += -10.;
 	auto r = FPoint(sin(self->_angle)*7.f, cos(self->_angle)*7.f);
 	self->_effect->SetPos(self->_pos + r);
@@ -65,28 +77,16 @@ void Bullet::Update(float dt)
 	}
 }
 
-void Bullet::SetStartPoint(const IPoint& mouse_pos) {
-	if (!self->_fly) {
-		float ex = Render::device.Width() * 0.5f;
-		float dx = ex - mouse_pos.x;
-		float dy = mouse_pos.y;
-		auto angle = atan2(dy, dx);
-		auto x = -175 * cos(angle);
-		auto y = 200 * sin(angle);
-		self->_pos = self->_st + FPoint(x, y);
-		self->_sp = self->_pos;
-	}
-}
-
-void Bullet::FlyTo(const FPoint& p) {
+void Bullet::InitDirection(const IPoint& mouse_pos) {
 	if (!self->_fly) {
 		self->_fly = true;
-		self->_pos = self->_sp;
-		self->_delta = self->_pos - p;
+		auto angle = atan2(mouse_pos.y, Render::device.Width() * 0.5f - mouse_pos.x);
+		self->_sp = self->_st + FPoint(self->ANGLE_X * cos(angle), self->ANGLE_Y * sin(angle));
+		self->_delta = self->_sp - mouse_pos;
 		auto th = atan((self->_delta.y) / (self->_delta.x));
 		self->_delta.x = self->_speed * cos(th);
 		self->_delta.y = self->_speed * sin(th);
-		if (p.x < self->_pos.x)
+		if (mouse_pos.x < self->_pos.x)
 		{
 			self->_delta.x = -self->_delta.x;
 			self->_delta.y = -self->_delta.y;
@@ -106,8 +106,8 @@ void Bullet::Stop() const {
 
 const IRect& Bullet::GetRect() const {
 	auto rect = self->_tex->getBitmapRect();
-	auto w = rect.Width() * .1f;
-	auto h = rect.Height() * .1f;
+	auto w = rect.Width() * self->MARGIN; 
+	auto h = rect.Height() * self->MARGIN;
 	self->_rect = IRect(self->_pos.x + w, self->_pos.y + h, rect.RightTop().x - w, rect.RightTop().y - h);
 	return self->_rect;
 }

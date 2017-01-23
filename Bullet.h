@@ -9,8 +9,7 @@ public:
 	~Bullet();
 	void Draw();
 	void Update(float dt);
-	void FlyTo(const FPoint& p);
-	void SetStartPoint(const IPoint& mouse_pos);
+	void InitDirection(const IPoint& mouse_pos);
 	bool IsFly() const;
 	void Stop() const;
 	const IRect& GetRect() const;
