@@ -33,6 +33,11 @@ public:
 	Bullets _bullets;
 	Effects _effects;
 
+	// точка где, будут воскресать пули
+	const FPoint BULLET_RESPAWN_POINT = FPoint(Render::device.Width() * 0.5f, -30.f);
+	// граница снизу, чтобы мишени не залетали на пушку
+	const float BOTTOM_MARGIN = 250.f;
+
 public:
 	Self()
 		: _acc(0)
@@ -41,7 +46,7 @@ public:
 
 	// если курсор не слишком близко к краю окна и прошла задержка с предыдущего выстрела, можно стрелять
 	bool is_allow_to_shoot(const IPoint& mouse_pos) {
-		if (mouse_pos.y > 250 && _acc > SHOOT_DELAY)
+		if (mouse_pos.y > BOTTOM_MARGIN && _acc > SHOOT_DELAY)
 			return true;
 		return false;
 	}
@@ -68,8 +73,8 @@ public:
 			_targets.push_back(
 				Target::create(
 					Core::resourceManager.Get<Render::Texture>("blue_bubble"),
-					game_utils::random_vec(300, 600), // случайная стартовая позиция
-					game_utils::random_vec(-5, 5), // случайное направление
+					game_utils::random_vec(BOTTOM_MARGIN * 1.5f, Render::device.Height() * .8f), // случайная стартовая позиция
+					game_utils::random_vec(-Config::get("Speed"), Config::get("Speed")), // случайное направление
 					game_utils::random_float() // случайный размер
 				)
 			);
@@ -178,9 +183,8 @@ bool Shooter::MouseDown(const IPoint &mouse_pos)
 		// при возможности стреляем
 		if (self->_bullets.size() < self->MAX_BULLETS && self->is_allow_to_shoot(mouse_pos)) {
 			self->_bullets.push_back(Bullet::create(Core::resourceManager.Get<Render::Texture>("serious_bomb2"),
-				FPoint(Render::device.Width() * 0.5f, -30), Config::get("Speed")));
-			self->_bullets.back()->SetStartPoint(mouse_pos);
-			self->_bullets.back()->FlyTo(FPoint(mouse_pos.x, mouse_pos.y));
+				self->BULLET_RESPAWN_POINT, Config::get("Speed")));
+			self->_bullets.back()->InitDirection(mouse_pos);
 			self->_acc = .0f;
 		}
 	}
@@ -191,7 +195,7 @@ void Shooter::MouseMove(const IPoint &mouse_pos)
 {
 	if (self->_run) {
 		// не поворачиваем пушку на себя
-		if (mouse_pos.y <= 250) {
+		if (mouse_pos.y <= self->BOTTOM_MARGIN) {
 			return;
 		}
 		// получаем угол наклона пушки, взависимости от положения курсора
