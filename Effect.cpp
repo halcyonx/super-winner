@@ -5,7 +5,7 @@ std::unique_ptr<Effect> Effect::create(const std::string& name, const FPoint& po
 	return std::make_unique<Effect>(name, pos, splined);
 }
 
-/*ass Effect::Self {
+class Effect::Self {
 public:
 	EffectsContainer _effCont;
 	ParticleEffectPtr _eff;
@@ -17,11 +17,10 @@ public:
 	bool _active;
 	bool _alive;
 	bool _splined;
-};*/
+};
 
 Effect::Effect(const std::string& name, const FPoint& pos, bool splined) {
-	//self = std::unique_ptr<Self>(new Self);
-	self = this;
+	self = std::unique_ptr<Self>(new Self);
 	self->_dt = .0f;
 	self->_active = false;
 	self->_alive = false;
@@ -50,8 +49,7 @@ Effect::Effect(const std::string& name, const FPoint& pos, bool splined) {
 }
 
 Effect::~Effect() 
-{
-}
+{}
 
 void Effect::Draw() {
 	self->_effCont.Draw();

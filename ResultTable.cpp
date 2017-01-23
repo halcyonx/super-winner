@@ -14,16 +14,15 @@ std::unique_ptr<ResultTable> ResultTable::create(int scored, int targets, const 
 }
 
 ResultTable::ResultTable(int scored, int targets, const FPoint& pos) {
-	self = new Self;
+	self = std::unique_ptr<Self>(new Self);
 	self->_scored = scored;
 	self->_targets = targets;
 	self->_pos = pos;
 	self->_show = false;
 }
 
-ResultTable::~ResultTable() {
-	delete self;
-}
+ResultTable::~ResultTable() 
+{}
 
 void ResultTable::Draw() {
 	if (self->_show) {

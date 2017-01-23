@@ -13,15 +13,14 @@ std::unique_ptr<WinPlate> WinPlate::create(Render::Texture* tex, const FPoint& p
 }
 
 WinPlate::WinPlate(Render::Texture* tex, const FPoint& pos) {
-	self = new Self;
+	self = std::unique_ptr<Self>(new Self);
 	self->_tex = tex;
 	self->_pos = pos;
 	self->_show = false;
 }
 
-WinPlate::~WinPlate() {
-	delete self;
-}
+WinPlate::~WinPlate() 
+{}
 
 void WinPlate::Draw() {
 	if (self->_show) {

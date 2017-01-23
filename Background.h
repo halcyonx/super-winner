@@ -1,5 +1,6 @@
 #pragma once
 
+
 class Background {
 public:
 	static std::unique_ptr<Background> create(Render::Texture* tex);

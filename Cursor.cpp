@@ -11,13 +11,12 @@ std::unique_ptr<Cursor> Cursor::create(Render::Texture* tex) {
 }
 
 Cursor::Cursor(Render::Texture* tex) {
-	self = new Self;
+	self = std::unique_ptr<Self>(new Self);
 	self->_tex = tex;
 }
 
-Cursor::~Cursor() {
-	delete self;
-}
+Cursor::~Cursor() 
+{}
 
 void Cursor::Draw() {
 	Render::device.PushMatrix();

@@ -12,14 +12,13 @@ std::unique_ptr<Scores> Scores::create(int initial, const FPoint& pos) {
 }
 
 Scores::Scores(int initial, const FPoint& pos) {
-	self = new Self;
+	self = std::unique_ptr<Self>(new Self);
 	self->_scores = initial;
 	self->_pos = pos;
 }
 
-Scores::~Scores() {
-	delete self;
-}
+Scores::~Scores() 
+{}
 
 void Scores::Set(int score) {
 	self->_scores = score;

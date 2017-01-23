@@ -18,7 +18,7 @@ std::unique_ptr<Timer> Timer::create(int t, const FPoint& pos, bool reverse) {
 }
 
 Timer::Timer(int t, const FPoint& pos, bool reverse) {
-	self = new Self;
+	self = std::unique_ptr<Self>(new Self);
 	self->_t = (reverse ? .0f : t);
 	self->_acc = (reverse ? t : .0f);
 	self->_init = self->_acc;
@@ -29,9 +29,8 @@ Timer::Timer(int t, const FPoint& pos, bool reverse) {
 	self->_scale = 1.f;
 }
 
-Timer::~Timer() {
-	delete self;
-}
+Timer::~Timer() 
+{}
 
 void Timer::Update(float dt) {
 	if (self->_active) {

@@ -24,16 +24,14 @@ public:
 Interface::Interface(const std::string& name, rapidxml::xml_node<>* elem)
 	: Widget(name)
 {
-	self = new Self;
 	Init();
 }
 
 Interface::~Interface()
-{
-	delete self;
-}
+{}
 
 void Interface::Init() {
+	self = std::unique_ptr<Self>(new Self);
 	self->_main_timer = Timer::create(Config::get("Time"));
 	self->_replay_button = ReplayButton::create();
 	self->_cursor = Cursor::create();

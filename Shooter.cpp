@@ -20,11 +20,8 @@ using Effects = std::list<std::unique_ptr<Effect>>;
 
 class Shooter::Self {
 public:
-	// количество пуль, которые могут быть выпущены одновременно
-	const unsigned int MAX_BULLETS = 3;
-	// задержка прсое выстрела
-	const float SHOOT_DELAY = .5f;
 	bool _run;
+	// _acc отсчитывает задержку после выстрела
 	float _acc;
 
 	ptr(Background) _background;
@@ -37,6 +34,10 @@ public:
 	const FPoint BULLET_RESPAWN_POINT = FPoint(Render::device.Width() * 0.5f, -30.f);
 	// граница снизу, чтобы мишени не залетали на пушку
 	const float BOTTOM_MARGIN = 250.f;
+	// количество пуль, которые могут быть выпущены одновременно
+	const unsigned int MAX_BULLETS = 3;
+	// задержка прсое выстрела
+	const float SHOOT_DELAY = .5f;
 
 public:
 	Self()
@@ -85,16 +86,15 @@ public:
 Shooter::Shooter(const std::string& name, rapidxml::xml_node<>* elem)
 	: Widget(name)
 {
-	self = new Self;
 	Init();
 }
 
-Shooter::~Shooter() {
-	delete self;
-}
+Shooter::~Shooter() 
+{}
 
 void Shooter::Init()
 {
+	self = std::unique_ptr<Self>(new Self);
 	self->_background = Background::create(Core::resourceManager.Get<Render::Texture>("background01"));
 	self->_gun = Gun::create(Core::resourceManager.Get<Render::Texture>("gun"), FPoint(Render::device.Width() * 0.5f, 80.f));
 

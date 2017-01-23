@@ -22,7 +22,7 @@ std::unique_ptr<ReplayButton> ReplayButton::create(
 }
 
 ReplayButton::ReplayButton(Render::Texture *normal, Render::Texture *active, Render::Texture *pressed, const FPoint& pos) {
-	self = new Self;
+	self = std::unique_ptr<Self>(new Self);
 	self->_tex = normal;
 	self->_replay_normal = normal;
 	self->_replay_active = active;
@@ -31,9 +31,8 @@ ReplayButton::ReplayButton(Render::Texture *normal, Render::Texture *active, Ren
 	self->_visible = false;
 }
 
-ReplayButton::~ReplayButton() {
-	delete self;
-}
+ReplayButton::~ReplayButton() 
+{}
 
 void ReplayButton::Draw() {
 	if (self->_visible) {

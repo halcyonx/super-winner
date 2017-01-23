@@ -1,6 +1,10 @@
 ﻿#include "stdafx.h"
 #include "TestWidget.h"
 
+//
+// это тестовый виджет, в игре не используется
+//
+
 // #define TESTED
 
 #ifdef TESTED
@@ -32,22 +36,20 @@ TestWidget::TestWidget(const std::string& name, rapidxml::xml_node<>* elem)
 	: Widget(name)
 {
 #ifdef TESTED
-	self = new Self;
+	Init();
+#endif // TESTED
+}
+TestWidget::~TestWidget() 
+{}
+
+void TestWidget::Init() {
+#ifdef TESTED
+	self = std::unique_ptr(new Self);
 	self->_test_gun = Core::resourceManager.Get<Render::Texture>("gun");
 	self->_d = std::make_unique<Distortion>(2, 5);
 	self->_d->SetRenderRect(self->_test_gun->getBitmapRect());
 	self->_timer = .0f;
-	Init();
 #endif // TESTED
-}
-TestWidget::~TestWidget() {
-#ifdef TESTED
-	delete self;
-#endif // TESTED
-}
-
-void TestWidget::Init() {
-
 }
 
 void TestWidget::Draw() {

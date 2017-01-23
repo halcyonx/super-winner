@@ -13,15 +13,14 @@ std::unique_ptr<Gun> Gun::create(Render::Texture* tex, const FPoint& pos) {
 }
 
 Gun::Gun(Render::Texture* tex, const FPoint& pos) {
-	self = new Self;
+	self = std::unique_ptr<Self>(new Self);
 	self->_tex = tex;
 	self->_pos = pos;
 	self->_angle = 0.f;
 }
 
-Gun::~Gun() {
-	delete self;
-}
+Gun::~Gun() 
+{}
 
 void Gun::Draw()
 {
