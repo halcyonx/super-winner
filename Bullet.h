@@ -18,5 +18,5 @@ public:
 	std::unique_ptr<Effect> effect();
 private:
 	class Self;
-	Self* self;
+	std::unique_ptr<Self> self;
 };

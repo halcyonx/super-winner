@@ -1,4 +1,4 @@
-#include "stdafx.h"
+п»ї#include "stdafx.h"
 #include "Shooter.h"
 #include "Background.h"
 #include "Target.h"
@@ -20,9 +20,9 @@ using Effects = std::list<std::unique_ptr<Effect>>;
 
 class Shooter::Self {
 public:
-	// количество пуль, которые могут быть выпущены одновременно
+	// РєРѕР»РёС‡РµСЃС‚РІРѕ РїСѓР»СЊ, РєРѕС‚РѕСЂС‹Рµ РјРѕРіСѓС‚ Р±С‹С‚СЊ РІС‹РїСѓС‰РµРЅС‹ РѕРґРЅРѕРІСЂРµРјРµРЅРЅРѕ
 	const unsigned int MAX_BULLETS = 3;
-	// задержка прсое выстрела
+	// Р·Р°РґРµСЂР¶РєР° РїСЂСЃРѕРµ РІС‹СЃС‚СЂРµР»Р°
 	const float SHOOT_DELAY = .5f;
 	bool _run;
 	float _acc;
@@ -39,14 +39,14 @@ public:
 		, _run(true)
 	{}
 
-	// если курсор не слишком близко к краю окна и прошла задержка с предыдущего выстрела, можно стрелять
+	// РµСЃР»Рё РєСѓСЂСЃРѕСЂ РЅРµ СЃР»РёС€РєРѕРј Р±Р»РёР·РєРѕ Рє РєСЂР°СЋ РѕРєРЅР° Рё РїСЂРѕС€Р»Р° Р·Р°РґРµСЂР¶РєР° СЃ РїСЂРµРґС‹РґСѓС‰РµРіРѕ РІС‹СЃС‚СЂРµР»Р°, РјРѕР¶РЅРѕ СЃС‚СЂРµР»СЏС‚СЊ
 	bool is_allow_to_shoot(const IPoint& mouse_pos) {
 		if (mouse_pos.y > 250 && _acc > SHOOT_DELAY)
 			return true;
 		return false;
 	}
 	
-	// проверка столкновения пули с мишенями
+	// РїСЂРѕРІРµСЂРєР° СЃС‚РѕР»РєРЅРѕРІРµРЅРёСЏ РїСѓР»Рё СЃ РјРёС€РµРЅСЏРјРё
 	void collide() {
 		for (auto &bullet : _bullets) {
 			auto bullet_rect = bullet->GetRect();
@@ -61,16 +61,16 @@ public:
 		}
 	}
 
-	// инициализация мишеней
+	// РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РјРёС€РµРЅРµР№
 	void init_targets() {
 		_targets.clear();
 		for (int i = 0; i < Config::get("CountTarget"); ++i) {
 			_targets.push_back(
 				Target::create(
 					Core::resourceManager.Get<Render::Texture>("blue_bubble"),
-					game_utils::random_vec(300, 600), // случайная стартовая позиция
-					game_utils::random_vec(-5, 5), // случайное направление
-					game_utils::random_float() // случайный размер
+					game_utils::random_vec(300, 600), // СЃР»СѓС‡Р°Р№РЅР°СЏ СЃС‚Р°СЂС‚РѕРІР°СЏ РїРѕР·РёС†РёСЏ
+					game_utils::random_vec(-5, 5), // СЃР»СѓС‡Р°Р№РЅРѕРµ РЅР°РїСЂР°РІР»РµРЅРёРµ
+					game_utils::random_float() // СЃР»СѓС‡Р°Р№РЅС‹Р№ СЂР°Р·РјРµСЂ
 				)
 			);
 		}
@@ -93,7 +93,7 @@ void Shooter::Init()
 	self->_background = Background::create(Core::resourceManager.Get<Render::Texture>("background01"));
 	self->_gun = Gun::create(Core::resourceManager.Get<Render::Texture>("gun"), FPoint(Render::device.Width() * 0.5f, 80.f));
 
-	// инициализация мишеней
+	// РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РјРёС€РµРЅРµР№
 	self->init_targets();
 }
 
@@ -139,14 +139,14 @@ void Shooter::Update(float dt)
 		target->Update(dt);
 	}
 
-	// update всех выпущенных снарядов
+	// update РІСЃРµС… РІС‹РїСѓС‰РµРЅРЅС‹С… СЃРЅР°СЂСЏРґРѕРІ
 	for (auto iter = self->_bullets.begin(); iter != self->_bullets.end();) {
 		(*iter)->Update(dt);
 		auto temp = iter++;
 		//
-		// если снаряд перестал лететь (пересек границу окна/попал в цель),
-		// удаляется из списка и эффект, привязанный к снаряду отдается в список общих эффектов, для плавного завершения
-		// в противном случае он просто пропал бы
+		// РµСЃР»Рё СЃРЅР°СЂСЏРґ РїРµСЂРµСЃС‚Р°Р» Р»РµС‚РµС‚СЊ (РїРµСЂРµСЃРµРє РіСЂР°РЅРёС†Сѓ РѕРєРЅР°/РїРѕРїР°Р» РІ С†РµР»СЊ),
+		// СѓРґР°Р»СЏРµС‚СЃСЏ РёР· СЃРїРёСЃРєР° Рё СЌС„С„РµРєС‚, РїСЂРёРІСЏР·Р°РЅРЅС‹Р№ Рє СЃРЅР°СЂСЏРґСѓ РѕС‚РґР°РµС‚СЃСЏ РІ СЃРїРёСЃРѕРє РѕР±С‰РёС… СЌС„С„РµРєС‚РѕРІ, РґР»СЏ РїР»Р°РІРЅРѕРіРѕ Р·Р°РІРµСЂС€РµРЅРёСЏ
+		// РІ РїСЂРѕС‚РёРІРЅРѕРј СЃР»СѓС‡Р°Рµ РѕРЅ РїСЂРѕСЃС‚Рѕ РїСЂРѕРїР°Р» Р±С‹
 		if (!(*temp)->IsFly()) {
 			self->_effects.push_back((*temp)->effect());
 			self->_effects.back()->Stop();
@@ -154,10 +154,10 @@ void Shooter::Update(float dt)
 		}
 	}
 
-	// проверка на столкновения пуль с мишенями
+	// РїСЂРѕРІРµСЂРєР° РЅР° СЃС‚РѕР»РєРЅРѕРІРµРЅРёСЏ РїСѓР»СЊ СЃ РјРёС€РµРЅСЏРјРё
 	self->collide();
 
-	// update действующих эффектов
+	// update РґРµР№СЃС‚РІСѓСЋС‰РёС… СЌС„С„РµРєС‚РѕРІ
 	for (auto iter = self->_effects.begin(); iter != self->_effects.end(); ) {
 		(*iter)->Update(dt);
 		if ((*iter)->Expires() && (*iter)->Alive()) {
@@ -175,7 +175,7 @@ void Shooter::Update(float dt)
 bool Shooter::MouseDown(const IPoint &mouse_pos)
 {
 	if (self->_run) {
-		// при возможности стреляем
+		// РїСЂРё РІРѕР·РјРѕР¶РЅРѕСЃС‚Рё СЃС‚СЂРµР»СЏРµРј
 		if (self->_bullets.size() < self->MAX_BULLETS && self->is_allow_to_shoot(mouse_pos)) {
 			self->_bullets.push_back(Bullet::create(Core::resourceManager.Get<Render::Texture>("serious_bomb2"),
 				FPoint(Render::device.Width() * 0.5f, -30), Config::get("Speed")));
@@ -190,16 +190,16 @@ bool Shooter::MouseDown(const IPoint &mouse_pos)
 void Shooter::MouseMove(const IPoint &mouse_pos)
 {
 	if (self->_run) {
-		// не поворачиваем пушку на себя
+		// РЅРµ РїРѕРІРѕСЂР°С‡РёРІР°РµРј РїСѓС€РєСѓ РЅР° СЃРµР±СЏ
 		if (mouse_pos.y <= 250) {
 			return;
 		}
-		// получаем угол наклона пушки, взависимости от положения курсора
+		// РїРѕР»СѓС‡Р°РµРј СѓРіРѕР» РЅР°РєР»РѕРЅР° РїСѓС€РєРё, РІР·Р°РІРёСЃРёРјРѕСЃС‚Рё РѕС‚ РїРѕР»РѕР¶РµРЅРёСЏ РєСѓСЂСЃРѕСЂР°
 		float dx = Render::device.Width() * 0.5f - mouse_pos.x;
 		float dy = mouse_pos.y;
 		auto th = atan2(dx, dy);
 		th *= 180 / math::PI;
-		// поворачиваем пушку
+		// РїРѕРІРѕСЂР°С‡РёРІР°РµРј РїСѓС€РєСѓ
 		self->_gun->Rotate(th);
 	}
 }

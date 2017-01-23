@@ -9,5 +9,5 @@ public:
 	void Draw();
 private:
 	class Self;
-	Self* self;
+	std::unique_ptr<Self> self;
 };

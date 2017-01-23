@@ -17,6 +17,17 @@ public:
 	bool Alive(bool a = true);
 
 private:
-	class Self;
-	Self *self;
+	//class Self;
+	//std::unique_ptr<Self> self;
+	EffectsContainer _effCont;
+	ParticleEffectPtr _eff;
+	TimedSpline<FPoint> _spline;
+	std::vector<FPoint> _coords;
+	FPoint _pos;
+	float _dt;
+	float _t;
+	bool _active;
+	bool _alive;
+	bool _splined;
+	Effect *self;
 };

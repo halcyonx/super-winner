@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "TestAppDelegate.h"
 
 #define MYAPPLICATION_NAME L"Test"

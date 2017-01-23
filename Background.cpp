@@ -11,13 +11,12 @@ public:
 };
 
 Background::Background(Render::Texture* tex) {
-	self = new Self;
+	self = std::unique_ptr<Self>(new Self);
 	self->_tex = tex;
 }
 
-Background::~Background() {
-	delete self;
-}
+Background::~Background() 
+{}
 
 void Background::Draw() {
 	Render::device.PushMatrix();

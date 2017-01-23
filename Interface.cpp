@@ -1,4 +1,4 @@
-#include "stdafx.h"
+ï»¿#include "stdafx.h"
 #include "Interface.h"
 #include "Timer.h"
 #include "ReplayButton.h"
@@ -58,7 +58,7 @@ void Interface::Draw() {
 }
 
 void Interface::Update(float dt) {
-	// åñëè âðåìÿ èãðû èñòåêëî
+	// ÐµÑÐ»Ð¸ Ð²Ñ€ÐµÐ¼Ñ Ð¸Ð³Ñ€Ñ‹ Ð¸ÑÑ‚ÐµÐºÐ»Ð¾
 	if (self->_main_timer->IsActive() && self->_main_timer->Expired()) {
 		Core::guiManager.getLayer("TestLayer")->getWidget("Shooter")->AcceptMessage(Message("StopGame", "StopGame"));
 		self->_replay_button->Show();

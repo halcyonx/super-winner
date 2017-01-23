@@ -1,4 +1,4 @@
-#ifndef __TESTAPPDELEGATE_H__
+﻿#ifndef __TESTAPPDELEGATE_H__
 #define __TESTAPPDELEGATE_H__
 
 #pragma once

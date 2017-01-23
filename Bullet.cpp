@@ -20,7 +20,7 @@ std::unique_ptr<Bullet> Bullet::create(Render::Texture* tex, const FPoint& pos, 
 }
 
 Bullet::Bullet(Render::Texture* tex, const FPoint& pos, int speed) {
-	self = new Self;
+	self = std::unique_ptr<Self>(new Self);
 	
 	self->_tex = tex;
 	self->_pos = pos;
@@ -31,9 +31,8 @@ Bullet::Bullet(Render::Texture* tex, const FPoint& pos, int speed) {
 	self->_angle = .0f;
 }
 
-Bullet::~Bullet() {
-	delete self;
-}
+Bullet::~Bullet() 
+{}
 
 void Bullet::Draw() {
 	if (self->_fly)

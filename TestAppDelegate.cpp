@@ -3,7 +3,7 @@
 #include "Shooter.h"
 #include "Interface.h"
 
-#define DEBUG
+// #define DEBUG
 
 #ifdef DEBUG
 
