@@ -10,6 +10,8 @@ public:
 	void Update(float dt);
 	void SetScale(float scale);
 	void SetDirection(const FPoint& dir);
+	void Kill();
+	bool IsKilled() const;
 	const IRect& GetRect() const;
 private:
 	class Self;

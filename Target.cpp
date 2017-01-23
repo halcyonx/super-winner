@@ -10,6 +10,7 @@ public:
 	int _width;
 	int _height;
 	float _scale;
+	bool _killed;
 
 	// граница снизу, чтобы мишени не залетали на пушку
 	static float BOTTOM_MARGIN;
@@ -32,6 +33,7 @@ Target::Target(Render::Texture* tex, const FPoint& pos, const FPoint& dir, float
 	self->_scale = scale;
 	self->_height = Render::device.Height();
 	self->_width = Render::device.Width();
+	self->_killed = false;
 }
 
 Target::~Target() 
@@ -67,6 +69,14 @@ void Target::SetScale(float scale)
 void Target::SetDirection(const FPoint& dir)
 {
 	self->_dir = dir;
+}
+
+void Target::Kill() {
+	self->_killed = true;
+}
+
+bool Target::IsKilled() const {
+	return self->_killed;
 }
 
 const IRect& Target::GetRect() const
