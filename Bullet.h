@@ -1,4 +1,5 @@
 #pragma once
+#include "Effect.h"
 
 class Bullet {
 public:
@@ -14,6 +15,7 @@ public:
 	void Stop() const;
 	const IRect& GetRect() const;
 	const FPoint& GetPos() const;
+	std::unique_ptr<Effect> effect();
 private:
 	class Self;
 	Self* self;

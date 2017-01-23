@@ -1,11 +1,10 @@
 #include "stdafx.h"
 #include "Bullet.h"
-#include "SimpleEffect.h"
 
 class Bullet::Self {
 public:
 	Render::Texture* _tex;
-	std::unique_ptr<SimpleEffect> _effect;
+	std::unique_ptr<Effect> _effect;
 	IRect _rect;
 	FPoint _pos;
 	FPoint _st, _sp;
@@ -56,7 +55,6 @@ void Bullet::Update(float dt)
 	self->_angle += -10.;
 	auto r = FPoint(sin(self->_angle)*7.f, cos(self->_angle)*7.f);
 	self->_effect->SetPos(self->_pos + r);
-	//Log::Debug("pos: " + std::to_string(cos(dt)*50.f) + ", " + std::to_string(sin(dt)*50.f));
 	self->_effect->Update(dt);
 	if (self->_pos.x >= Render::device.Width() || self->_pos.x <= 0)
 	{
@@ -95,7 +93,7 @@ void Bullet::FlyTo(const FPoint& p) {
 			self->_delta.y = -self->_delta.y;
 		}
 		self->_pos = self->_sp + 5 * self->_delta;
-		self->_effect = SimpleEffect::create(self->_pos);
+		self->_effect = Effect::create("TestedFire", self->_pos, false);
 	}
 }
 
@@ -117,4 +115,8 @@ const IRect& Bullet::GetRect() const {
 
 const FPoint& Bullet::GetPos() const {
 	return self->_pos;
+}
+
+std::unique_ptr<Effect> Bullet::effect() {
+	return move(self->_effect);
 }
