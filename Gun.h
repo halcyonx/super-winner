@@ -7,8 +7,6 @@ public:
 	Gun(Render::Texture* tex, const FPoint& pos);
 	~Gun();
 	void Draw();
-	void Update(float dt);
-	void Shoot(float x, float y);
 	void Rotate(float angle);
 private:
 	class Self;

@@ -43,5 +43,5 @@ namespace game_utils {
 			}
 			return items;
 		}
-	}
+	} // ns
 } // namespace utils

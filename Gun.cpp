@@ -33,16 +33,6 @@ void Gun::Draw()
 	Render::device.PopMatrix();
 }
 
-void Gun::Update(float dt)
-{
-
-}
-
-void Gun::Shoot(float x, float y)
-{
-
-}
-
 void Gun::Rotate(float angle)
 {
 	self->_angle = angle;

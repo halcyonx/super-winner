@@ -9,8 +9,7 @@
 #include "Config.h"
 #include <memory>
 
-#define TESTED
-#define DEBUG
+// #define DEBUG
 
 #define ptr(t) \
 std::unique_ptr<t>
@@ -21,23 +20,24 @@ using Effects = std::list<std::unique_ptr<Effect>>;
 
 class Shooter::Self {
 public:
-	Self()
-		: _timer(0)
-		, _acc(0)
-		, _run(true)
-	{}
-
 	// количество пуль, которые могут быть выпущены одновременно
 	const unsigned int MAX_BULLETS = 3;
+	// задержка прсое выстрела
 	const float SHOOT_DELAY = .5f;
 	bool _run;
-	float _timer, _acc;
+	float _acc;
 
 	ptr(Background) _background;
 	ptr(Gun) _gun;
 	Targets _targets;
 	Bullets _bullets;
 	Effects _effects;
+
+public:
+	Self()
+		: _acc(0)
+		, _run(true)
+	{}
 
 	// если курсор не слишком близко к краю окна и прошла задержка с предыдущего выстрела, можно стрелять
 	bool is_allow_to_shoot(const IPoint& mouse_pos) {
@@ -52,10 +52,9 @@ public:
 			auto bullet_rect = bullet->GetRect();
 			for (auto iter = _targets.begin(); iter != _targets.end(); ++iter)
 				if (bullet_rect.Intersects((*iter)->GetRect())) {
-					//auto temp = iter++;
 					_targets.erase(iter);
 					bullet->Stop();
-					_effects.push_back(Effect::create(bullet->GetPos()));
+					_effects.push_back(Effect::create("Iskra2", bullet->GetPos()));
 					_effects.back()->Start();
 					break;
 				}
@@ -106,7 +105,6 @@ void Shooter::Reset() {
 
 void Shooter::Draw()
 {
-	// draw stuff
 	self->_background->Draw();
 
 	for (auto& target : self->_targets) {
@@ -132,13 +130,8 @@ void Shooter::Draw()
 void Shooter::Update(float dt)
 {
 	if (!self->_run) return;
-	self->_timer += dt;
 	self->_acc += dt;
 
-	while (self->_timer > 2 * math::PI)
-	{
-		self->_timer -= 2 * math::PI;
-	}
 	if (self->_acc >= 10.f)
 		self->_acc = self->SHOOT_DELAY;
 
@@ -146,15 +139,25 @@ void Shooter::Update(float dt)
 		target->Update(dt);
 	}
 
+	// update всех выпущенных снарядов
 	for (auto iter = self->_bullets.begin(); iter != self->_bullets.end();) {
 		(*iter)->Update(dt);
 		auto temp = iter++;
-		if (!(*temp)->IsFly())
+		//
+		// если снаряд перестал лететь (пересек границу окна/попал в цель),
+		// удаляется из списка и эффект, привязанный к снаряду отдается в список общих эффектов, для плавного завершения
+		// в противном случае он просто пропал бы
+		if (!(*temp)->IsFly()) {
+			self->_effects.push_back((*temp)->effect());
+			self->_effects.back()->Stop();
 			self->_bullets.erase(temp);
+		}
 	}
 
+	// проверка на столкновения пуль с мишенями
 	self->collide();
 
+	// update действующих эффектов
 	for (auto iter = self->_effects.begin(); iter != self->_effects.end(); ) {
 		(*iter)->Update(dt);
 		if ((*iter)->Expires() && (*iter)->Alive()) {
@@ -165,18 +168,14 @@ void Shooter::Update(float dt)
 			iter = self->_effects.erase(iter);
 			continue;
 		}
-		iter++;
+		++iter;
 	}
 }
 
 bool Shooter::MouseDown(const IPoint &mouse_pos)
 {
-	if (!self->_run) return false;
-	if (Core::mainInput.GetMouseRightButton())
-	{
-	}
-	else 
-	{
+	if (self->_run) {
+		// при возможности стреляем
 		if (self->_bullets.size() < self->MAX_BULLETS && self->is_allow_to_shoot(mouse_pos)) {
 			self->_bullets.push_back(Bullet::create(Core::resourceManager.Get<Render::Texture>("serious_bomb2"),
 				FPoint(Render::device.Width() * 0.5f, -30), Config::get("Speed")));
@@ -190,19 +189,19 @@ bool Shooter::MouseDown(const IPoint &mouse_pos)
 
 void Shooter::MouseMove(const IPoint &mouse_pos)
 {
-	if (!self->_run) return;
-	// не поворачиваем пушку на себя
-	if (mouse_pos.y <= 250) {
-		return;
+	if (self->_run) {
+		// не поворачиваем пушку на себя
+		if (mouse_pos.y <= 250) {
+			return;
+		}
+		// получаем угол наклона пушки, взависимости от положения курсора
+		float dx = Render::device.Width() * 0.5f - mouse_pos.x;
+		float dy = mouse_pos.y;
+		auto th = atan2(dx, dy);
+		th *= 180 / math::PI;
+		// поворачиваем пушку
+		self->_gun->Rotate(th);
 	}
-	// получаем угол наклона пушки, взависимости от положения курсора
-	float ex = Render::device.Width() * 0.5f;
-	float dx = ex - mouse_pos.x;
-	float dy = mouse_pos.y;
-	auto th = atan2(dx, dy);
-	th *= 180 / math::PI;
-	// поворачиваем пушку
-	self->_gun->Rotate(th);
 }
 
 void Shooter::MouseUp(const IPoint &mouse_pos)

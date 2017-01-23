@@ -8,6 +8,3 @@ private:
 	static std::map<std::string, int> _params;
 	static int _init;
 };
-
-//Singleton<Config> single;
-//SingletonHolder<Config> config;
